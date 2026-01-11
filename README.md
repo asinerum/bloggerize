@@ -1,0 +1,2 @@
+# bloggerize
+Blogger API Lib
