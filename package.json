@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "bloggerize": "^1.0.0"
+    "bloggerize": "^1.0.0",
+    "jsdom": "^27.4.0",
+    "jsdom-global": "^3.0.2"
   }
 }
