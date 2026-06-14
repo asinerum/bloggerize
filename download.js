@@ -3,28 +3,24 @@ const fs = require('fs');
 let args = process.argv[2];
 
 if (!args) {
-  console.log(`
-  Mandatory argument is missing
+  console.log(`Error: Mandatory argument is missing
   Usage syntax:
-  node download.js "from:<FromDate>, to:[ToDate], page:[FromPage], pages:[Pages], dir:[ArchiveFolder], pte:[PrivateIndex], pdir:[PrivateArchiveFolder], url:[BlogURL]"
-  `);
+  node download.js "from:<FromDate>, to:[ToDate], page:[FromPage], pages:[Pages], dir:[ArchiveFolder], pte:[PrivateIndex], pdir:[PrivateArchiveFolder], url:[BlogURL]"`);
   process.exit(0);
 }
 
 require('bloggerize/loadlib');
 
-const { extractBlog, COMMENTS_PER_PAGE } = require('bloggerize/download');
-
-const BLOG_URL = 'https://an-hoang-trung-tuong-2014.blogspot.com';
+const { extractBlog, BLOG_URL, COMMENTS_PER_PAGE } = require('bloggerize/download');
 
 const PUBLIC_FOLDER = 'comment-archive';
 const PRIVATE_FOLDER = 'comment-archive.pte';
 
 args = args.extractInput();
 
-const fromdate = args.from || '';
+const fromdate = args.from || '01'+(new(Date)).toLocaleDateString('en-GB').slice(2);
 const frompage = Number(args.page) || 1;
-const todate = args.to || fromdate;
+const todate = args.to || (new(Date)).toLocaleDateString('en-GB');
 const pages = Number(args.pages) || 1;
 const pteindex = Number(args.pte) || 0;
 const url = args.url || BLOG_URL;
@@ -39,9 +35,7 @@ ptefolder.createFolder();
 async function main () {
   const entries = await extractBlog(fromdate, frompage, {todate, pages, url, limit, newest, pteindex});
   if (!Array.isArray(entries)) {
-    console.log(`
-    No valid posts found, program stopped
-    `);
+    console.log(`Error: No valid posts found, program stopped`);
     process.exit(0);
   }
   for (const entry of entries) {
@@ -49,12 +43,12 @@ async function main () {
     try {
       if (entry.vol > 0) {
         fs.writeFileSync(file, entry.html);
-        console.log(entry.file, '..done');
+        console.log('Success:', entry.file);
       } else {
-        console.log(entry.file, '..ignored');
+        console.log('Warning:', entry.file, 'ignored');
       }
     } catch (err) {
-      console.log(entry.file, '..failed read/write');
+      console.log('Error:', entry.file, 'read/write failed');
     }
   }
   console.log('All done');
